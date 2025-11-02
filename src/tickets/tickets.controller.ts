@@ -11,16 +11,17 @@ export class TicketsController {
         return this.ticketsService.findAll();
     }
 
-    @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.ticketsService.findOne(Number(id));
-    }
-
     @Get('client/:id')
     findByClient(@Param('id') id: string) {
         return this.ticketsService.findByClient(Number(id));
         //throw new Error('Test error');
     }
+
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.ticketsService.findOne(Number(id));
+    }
+
 
     @Get('technician/:id')
     findByTechnician(@Param('id') id: string) {

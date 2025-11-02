@@ -86,38 +86,19 @@ export class TicketsService {
         // });
 
         //de investigat daca conexiunea cu baza de date e picata
+        console.warn('[CHAOS] returning CORRUPT payload for client', clientId);
         return [{
-            "id": "1",
-            "client_id": "2",
-            "assigned_to": "3",
-            "title": "Telefon nu se aprinde",
-            "description": "fsgsdgsdgsdgsd",
-            "statuz": "resolved", //statuz
-            "priority": 2, //sa zica 2
-            "created_at": "2025-10-27T17:22:10.124Z",
-            "updated_at": "2025-10-27T17:22:10.124Z",
-            "due_at": null,
-            "closed_at": null,
-            "ticket_comments": [],
-            "users_tickets_client_idTousers": {
-                "id": "2",
-                "email": "client@test.com",
-                "full_name": "Client User",
-                "role": "client",
-                "password_hash": "$2b$10$DPrRFJe6KZFd3czap9QHVO7wc6Cxlza0ntNJ8gRaxxbl2WPQ7EFLe",
-                "created_at": "2025-10-26T00:20:01.853Z",
-                "updated_at": "2025-10-26T00:20:01.853Z"
-            },
-            "users_tickets_assigned_toTousers": {
-                "id": "3",
-                "email": "technician@test.com",
-                "full_name": "Technician User",
-                "role": "technician",
-                "password_hash": "$2b$10$JOeB.NEFHiP1r1BPuKn9Xe.YxMPw7lEgbE3Qh30h/Netsc0/uuhPi",
-                "created_at": "2025-10-26T00:20:02.263Z",
-                "updated_at": "2025-10-26T00:20:02.263Z"
-            }
-        }]// ce se intampla daca schimb cheile 
+            id: '1',                         // string, nu number
+            client_id: String(clientId),
+            assigned_to: '3',
+            title: 'Telefon nu se aprinde',
+            description: 'fsgsdgsdgsdgsd',
+            statuz: 'resolved',              
+            priority: 2,                     
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            ticket_comments: [],
+        }]; //ce se intampla daca schimb cheile 
     }
 
     // toate tichetele asignate unui tehnician
