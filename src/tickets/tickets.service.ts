@@ -1,57 +1,47 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Prisma } from '@prisma/client';
+import { CreateTicketDto } from './dto/create-ticket.dto';
+import { UpdateTicketDto } from './dto/update-ticket.dto';
+import { ticket_status, ticket_priority } from 'generated/prisma';
 
 
 @Injectable()
 export class TicketsService {
-    async create(data: {
-        client_id: number;               // obligatoriu
-        title: string;                    // obligatoriu
-        description: string;              // obligatoriu
-        assigned_to?: number | null;      // opțional
-        status?: 'new' | 'open' | 'in_progress' | 'on_hold' | 'resolved' | 'closed';     // opțional
-        priority?: 'low' | 'medium' | 'high' | 'urgent';                              // opțional
-    }) {
-        const ticket = await this.prisma.tickets.create({
+    constructor(private prisma: PrismaService) { }
+
+    async create(data: CreateTicketDto) {
+        return this.prisma.tickets.create({
             data: {
                 client_id: BigInt(data.client_id),
                 assigned_to: data.assigned_to != null ? BigInt(data.assigned_to) : null,
                 title: data.title,
                 description: data.description,
-                status: (data.status ?? 'new') as any,
-                priority: (data.priority ?? 'medium') as any,
-            },
-        });
-        return ticket;
-    }
-
-    async addComment(ticketId: number, data: { author_id: number; body: string }) {
-        return this.prisma.ticket_comments.create({
-            data: {
-                ticket_id: BigInt(ticketId),
-                author_id: BigInt(data.author_id),
-                body: data.body,
+                status: (data.status ?? 'new') as ticket_status,         
+                priority: (data.priority ?? 'medium') as ticket_priority, 
             },
         });
     }
 
-    async updateTicket(id: number, data: { status?: string; assigned_to?: number }) {
+    async updateTicket(id: number, data: UpdateTicketDto) {
         return this.prisma.tickets.update({
-            where: { id: BigInt(id) },   // atenție: id e BigInt
+            where: { id: BigInt(id) },
             data: {
-                ...(data.status && { status: data.status as any }),
-                ...(data.assigned_to !== undefined && { assigned_to: BigInt(data.assigned_to) }),
+                ...(data.status && { status: data.status as ticket_status }),
+                ...(data.assigned_to !== undefined && {
+                    assigned_to: data.assigned_to === null ? null : BigInt(data.assigned_to),
+                }),
             },
             include: {
-                ticket_comments: true, // relația cu comentariile
-                users_tickets_client_idTousers: true, // clientul
-                users_tickets_assigned_toTousers: true, // tehnicianul
+                ticket_comments: true,
+                users_tickets_client_idTousers: true,
+                users_tickets_assigned_toTousers: true,
             },
         });
     }
 
+    async addComment(ticketId: number, data: { author_id: number; body: string }) { return this.prisma.ticket_comments.create({ data: { ticket_id: BigInt(ticketId), author_id: BigInt(data.author_id), body: data.body, }, }); }
 
-    constructor(private prisma: PrismaService) { }
 
     // ia toate tichetele
     findAll() {
@@ -93,8 +83,8 @@ export class TicketsService {
             assigned_to: '3',
             title: 'Telefon nu se aprinde',
             description: 'fsgsdgsdgsdgsd',
-            statuz: 'resolved',              
-            priority: 2,                     
+            statuz: 'resolved',
+            priority: 2,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
             ticket_comments: [],

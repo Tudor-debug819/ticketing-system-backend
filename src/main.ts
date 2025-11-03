@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -21,6 +22,15 @@ async function bootstrap() {
     exposedHeaders: ['Content-Type', 'Authorization'],
     optionsSuccessStatus: 204,
   });
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,               // elimină câmpuri necunoscute (ex. statuz)
+      forbidNonWhitelisted: true,    // aruncă 400 dacă apare ceva în plus
+      transform: true,               // convertește automat string->number
+      transformOptions: { enableImplicitConversion: true },
+    }),
+  );
 
 
   (BigInt.prototype as any).toJSON = function () {
